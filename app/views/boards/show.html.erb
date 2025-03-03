@@ -12,38 +12,41 @@
   Add a new post
 </h2>
 
-<form action="/insert_post" method="post">
-  <div>
-    <label for="title_box">
-      Title
-    </label>
+<% if current_user != nil %>
+  <form action="/insert_post" method="post">
+    <div>
+      <label for="title_box">
+        Title
+      </label>
 
-    <input type="text" id="title_box" name="query_title">
-  </div>
+      <input type="text" id="title_box" name="query_title">
+    </div>
 
-  <div>
-    <label for="body_box">
-      Body
-    </label>
+    <div>
+      <label for="body_box">
+        Body
+      </label>
 
-    <textarea id="body_box" name="query_body" rows="3"></textarea>
-  </div>
+      <textarea id="body_box" name="query_body" rows="3"></textarea>
+    </div>
 
-  <div>
-    <label for="expires_on_box">
-      Expires on
-    </label>
+    <div>
+      <label for="expires_on_box">
+        Expires on
+      </label>
 
-    <input type="date" id="expires_on_box" name="query_expires_on">
-  </div>
+      <input type="date" id="expires_on_box" name="query_expires_on">
+    </div>
 
-  <input type="hidden" id="board_id_box" name="query_board_id" value="<%= @the_board.id %>">
+    <input type="hidden" id="board_id_box" name="query_board_id" value="<%= @the_board.id %>">
 
-  <button>
-    Add post
-  </button>
-</form>
-
+    <button>
+      Add post
+    </button>
+  </form>
+<% else %>
+  Must be <a href = "/users/sign_in">signed in</a> to add a post.
+<% end %>
 <hr>
 
 <h2>Active posts</h2>
@@ -52,14 +55,23 @@
   <tr>
     <th>Title</th>
     <th>Body</th>
+    <th>Posted by</th>
     <th>Posted on</th>
     <th>Expires on</th>
   </tr>
 
   <% @active_posts.each do |a_post| %>
     <tr>
-      <td><%= a_post.title %></td>
+      <td><%= a_post.title %>
+      <% if current_user != nil %>
+        <% if current_user.id == a_post.user_id %>
+          <br>
+          <a href = "/delete_post/<%= a_post.id %>">Delete post</a>
+        <% end %>
+      <% end %>
+      </td>
       <td><%= a_post.body %></td>
+      <td><%= User.where({ :id => a_post.user_id }).first.email %></td>
       <td><%= a_post.created_at.strftime("%b %e, %Y") %></td>
       <td><%= a_post.expires_on.strftime("%b %e, %Y") %></td>
     </tr>
@@ -72,6 +84,7 @@
   <tr>
     <th>Title</th>
     <th>Body</th>
+    <th>Posted by</th>
     <th>Posted on</th>
     <th>Expired on</th>
   </tr>
@@ -80,6 +93,7 @@
     <tr>
       <td><%= a_post.title %></td>
       <td><%= a_post.body %></td>
+      <td><%= User.where({ :id => a_post.user_id }).first.email %></td>
       <td><%= a_post.created_at.strftime("%b %e, %Y") %></td>
       <td><%= a_post.expires_on.strftime("%b %e, %Y") %></td>
     </tr>
